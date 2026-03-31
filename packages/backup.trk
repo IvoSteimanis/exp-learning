@@ -1,0 +1,440 @@
+* 00000010
+*! version 1.0.0
+* Do not erase or edit this file
+* It is used by Stata to track the ado and help
+* files you have installed.
+
+S http://fmwww.bc.edu/repec/bocode/e
+N estout.pkg
+D 24 Mar 2026
+U 1
+d 'ESTOUT': module to make regression tables
+d 
+d  estout produces a table of regression results from one or
+d several models for use with spreadsheets, LaTeX, HTML, or a
+d word-processor table. eststo stores a quick copy of the active
+d estimation results for later tabulation. esttab is a wrapper for
+d estout. It displays a pretty looking publication-style regression
+d table without much typing. estadd adds additional results to the
+d e()-returns for one or several models previously fitted and
+d stored. This package subsumes the previously circulated esto,
+d esta, estadd,  and estadd_plus. An earlier version of estout is
+d available  as estout1.
+d 
+d KW: estimates
+d KW: LaTeX
+d KW: HTML
+d KW: word processor
+d KW: output
+d 
+d Requires: Stata version 8.2
+d 
+d Distribution-Date: 20230212
+d 
+d Author: Ben Jann, University of Bern
+d Support: email jann@@soz.unibe.ch
+d 
+f _\_eststo.ado
+f _\_eststo.hlp
+f e\estadd.ado
+f e\estadd.hlp
+f e\estout.ado
+f e\estout.hlp
+f e\eststo.ado
+f e\eststo.hlp
+f e\estpost.ado
+f e\estpost.hlp
+f e\esttab.ado
+f e\esttab.hlp
+e
+S http://fmwww.bc.edu/repec/bocode/c
+N coefplot.pkg
+D 24 Mar 2026
+U 2
+d 'COEFPLOT': module to plot regression coefficients and other results
+d 
+d   coefplot plots results from estimation commands or Stata
+d matrices. Results from multiple models or matrices can be
+d combined in a single graph. The default behavior of coefplot is
+d to draw markers for coefficients and horizontal spikes for
+d confidence intervals. However, coefplot can also produce various
+d other types of graphs.
+d 
+d KW: graphics
+d KW: coefficients
+d KW: estimation
+d 
+d Requires: Stata version 11
+d 
+d Distribution-Date: 20250822
+d 
+d Author: Ben Jann, University of Bern
+d Support: email jann@@soz.unibe.ch
+d 
+f c\coefplot.ado
+f c\coefplot.sthlp
+e
+S http://fmwww.bc.edu/repec/bocode/s
+N schemepack.pkg
+D 24 Mar 2026
+U 3
+d 'SCHEMEPACK': module providing ready-to-use graph schemes
+d 
+d  schemepack releases a suite of graph schemes as part of The
+d Stata Guide (https://medium.com/the-stata-guide) series. See the
+d help file (help schemepack) for details after installation.
+d 
+d KW: Stata
+d KW: scheme
+d KW: graphs
+d 
+d Requires: Stata version 15
+d 
+d Distribution-Date: 20221111
+d 
+d Author: Asjad Naqvi, Austrian Institute of Economic Research (WIFO)
+d Support: email asjadnaqvi@@gmail.com
+d 
+f s\schemepack.sthlp
+f s\scheme-black_brbg.scheme
+f s\scheme-black_cividis.scheme
+f s\scheme-black_hue.scheme
+f s\scheme-black_jet.scheme
+f s\scheme-black_piyg.scheme
+f s\scheme-black_ptol.scheme
+f s\scheme-black_set3.scheme
+f s\scheme-black_tableau.scheme
+f s\scheme-black_viridis.scheme
+f s\scheme-black_w3d.scheme
+f s\scheme-cblind1.scheme
+f s\scheme-gg_brbg.scheme
+f s\scheme-gg_cividis.scheme
+f s\scheme-gg_hue.scheme
+f s\scheme-gg_jet.scheme
+f s\scheme-gg_piyg.scheme
+f s\scheme-gg_ptol.scheme
+f s\scheme-gg_set3.scheme
+f s\scheme-gg_tableau.scheme
+f s\scheme-gg_viridis.scheme
+f s\scheme-gg_w3d.scheme
+f s\scheme-neon.scheme
+f s\scheme-rainbow.scheme
+f s\scheme-swift_red.scheme
+f s\scheme-tab1.scheme
+f s\scheme-tab2.scheme
+f s\scheme-tab3.scheme
+f s\scheme-ukraine.scheme
+f s\scheme-white_brbg.scheme
+f s\scheme-white_cividis.scheme
+f s\scheme-white_hue.scheme
+f s\scheme-white_jet.scheme
+f s\scheme-white_piyg.scheme
+f s\scheme-white_ptol.scheme
+f s\scheme-white_set3.scheme
+f s\scheme-white_tableau.scheme
+f s\scheme-white_viridis.scheme
+f s\scheme-white_w3d.scheme
+e
+S http://fmwww.bc.edu/repec/bocode/s
+N stripplot.pkg
+D 24 Mar 2026
+U 4
+d 'STRIPPLOT': module for strip plots (one-way dot plots)
+d 
+d stripplot plots data as a series of marks against a single
+d     magnitude axis, horizontal or vertical. It is an Stata 8
+d  alternative to gr7, oneway or dotplot with more flexibility in
+d    several respects. Its predecessor, onewplot, remains available
+d to   users of Stata 7 or Stata 6 as a separate module.
+d 
+d KW: graphics
+d KW: dot plots
+d KW: oneway plots
+d KW: strip plots
+d KW: onewayplot
+d KW: scatter plot
+d KW: box plot
+d KW: confidence intervals
+d 
+d Requires: Stata version 8.2
+d 
+d Distribution-Date: 20240505
+d 
+d Author: Nicholas J. Cox, Durham University
+d Support: email N.J.Cox@@durham.ac.uk
+d 
+f s\stripplot.ado
+f s\stripplot.sthlp
+e
+S http://fmwww.bc.edu/repec/bocode/o
+N outreg2.pkg
+D 24 Mar 2026
+U 5
+d 'OUTREG2': module to arrange regression outputs into an illustrative table
+d 
+d  outreg2 provides a fast and easy way to produce an illustrative
+d table  of regression outputs. The regression outputs are produced
+d piecemeal and are  difficult to compare without some type of
+d rearrangement. outreg2  automates this process by concatenating
+d the successive regression outputs in a  vertical format. The
+d resulting table is saved to the disk in ASCII  format, which can
+d be read by other programs. outreg2 thus facilitates  the
+d convertion of regression outputs to a standard format suitable
+d for  inclusion in a scholarly publication. The functionality of
+d outreg2 is based on the earlier package outreg,  by John Luke
+d Gallup. Unlike outreg, outreg2 is capable of writing LaTeX-format
+d tables, as well as ASCII, MS Word and MS Excel.
+d 
+d KW: regression
+d KW: output
+d KW: tables
+d KW: tab-delimited output
+d KW: LaTeX
+d KW: Word
+d KW: Excel
+d 
+d Requires: Stata version 7
+d 
+d Distribution-Date: 20140817
+d 
+d Author: Roy Wada
+d Support: email roywada@@hotmail.com
+d 
+f o\outreg2.ado
+f o\outreg2_prf.ado
+f o\outreg2.hlp
+f s\shellout.ado
+f s\shellout.hlp
+f s\seeout.ado
+f s\seeout.hlp
+e
+S http://fmwww.bc.edu/repec/bocode/m
+N mylabels.pkg
+D 24 Mar 2026
+U 6
+d 'MYLABELS': module for axis labels or ticks on transformed scales or for daily dates
+d 
+d  mylabels and myticks generate axis labels and ticks on
+d transformed scales. Their use is best explained by example. You
+d draw a graph and one axis is on a transformed square root scale.
+d You wish the axis labels to show untransformed values. For some
+d values this is easy; for example, ylabel(0 1 2 "4" 3 "9" 4 "16" 5
+d "25") says use "4" as label for 2, and so forth. For other values
+d and/or other transformations the conversion may be more difficult
+d to do in your head. The idea behind mylabels is that you feed it
+d the numeric labels you want shown and the transformation being
+d used. It will then place the appropriate specification in a local
+d macro which you name. You may then use that local macro as part
+d of a later graphics command. The idea behind myticks is similar.
+d  mydays displays a formatted list of specified days that lie
+d within the range of a tsset daily date variable describing a time
+d series and puts the numeric version of that list in a specified
+d local macro. The result may be useful for specifying axis label
+d or tick positions on graphs of time series. mydays requires Stata
+d 9.0.
+d 
+d KW: graphics
+d KW: transformations
+d KW: axis labels
+d KW: axis ticks
+d KW: daily dates
+d KW: time series
+d 
+d Requires: Stata version 8.0 (9.0 for mydays)
+d 
+d Distribution-Date: 20220515
+d 
+d Author: Nicholas J. Cox, Durham University
+d Support: email N.J.Cox@@durham.ac.uk
+d 
+d Author: Scott Merryman
+d Support: email scott.merryman@@gmail.com
+d 
+f m\mylabels.ado
+f m\mylabels.sthlp
+f m\myticks.ado
+f m\myticks.hlp
+f m\mydays.ado
+f m\mydays.hlp
+e
+S http://fmwww.bc.edu/repec/bocode/i
+N ietoolkit.pkg
+D 24 Mar 2026
+U 7
+d 'IETOOLKIT': module providing commands specially developed for Impact Evaluations
+d 
+d  ietookit provides a set of commands that address different
+d aspects of data management and data analysis in relation to
+d Impact Evaluations. The list of commands will be extended
+d continuously, and suggestions on new commands are highly
+d appreciated. Some of the commands are related to standardized
+d practices developed at the World Bank’s unit for Impact
+d Evaluations (DIME) and might not apply to practices adopted at
+d other institutions. For these commands, the corresponding help
+d files provide justifications for the standardized practices
+d applied. ieduplicates and iecompdup are useful tools to identify
+d and correct for duplicates. iebaltab is a tool for multiple
+d treatment arm balance tables. ieboilstart standardizes the
+d boilerplate code at the top of all do-files. iegraph produces
+d graphs based on common impact evaluation regression models. See
+d https://github.com/worldbank/ietoolkit for more details.
+d 
+d KW: reproducible research
+d KW: impact evaluations
+d KW: data management
+d KW: survey data
+d KW: data analysis
+d KW: balance tables
+d KW: difference-in-differences
+d KW: matching
+d 
+d Requires: Stata version 12
+d 
+d Distribution-Date: 20240212
+d 
+d Author: DIME Analytics, The World Bank, DECIE
+d Support: email  lcardosodeandrad@@worldbank.org
+d 
+f i\ietoolkit.ado
+f i\ietoolkit.sthlp
+f i\iebaltab.ado
+f i\iebaltab.sthlp
+f i\ieboilsave.ado
+f i\ieboilsave.sthlp
+f i\ieboilstart.ado
+f i\ieboilstart.sthlp
+f i\ieddtab.ado
+f i\ieddtab.sthlp
+f i\iedorep.ado
+f i\iedorep.sthlp
+f i\iedropone.ado
+f i\iedropone.sthlp
+f i\iefolder.ado
+f i\iefolder.sthlp
+f i\iegitaddmd.ado
+f i\iegitaddmd.sthlp
+f i\iegraph.ado
+f i\iegraph.sthlp
+f i\iekdensity.ado
+f i\iekdensity.sthlp
+f i\iematch.ado
+f i\iematch.sthlp
+f i\iesave.ado
+f i\iesave.sthlp
+e
+S http://fmwww.bc.edu/repec/bocode/t
+N tabout.pkg
+D 24 Mar 2026
+U 8
+d 'TABOUT': module to export publication quality cross-tabulations
+d 
+d  tabout is a table building program for oneway and twoway
+d tables of frequencies and percentages, and for summary tables. It
+d produces publication quality tables for export to a text file.
+d These tables can then be used with spreadsheets, word processors,
+d web browsers or compilers like LaTeX. The tables produced by
+d tabout allow multiple panels so that a number of variables can be
+d included in the one table. tabout also provides standard errors
+d and confidence intervals, as well as a range of table statistics
+d (chi2 etc). The output from tabout matches Stata's tabulate, most
+d of tabstat and some of table.
+d 
+d KW: tables
+d KW: latex
+d KW: html
+d KW: delimited text
+d 
+d Requires: Stata version 9.2
+d 
+d Distribution-Date: 20190316
+d 
+d Author: Ian Watson , Macquarie University, Australia
+d Support: email mail@@ianwatson.com.au
+d 
+f t\tabout.ado
+f t\tabstatout.ado
+f t\tabout.hlp
+f f\figout.ado
+f f\figout.hlp
+e
+S http://fmwww.bc.edu/repec/bocode/b
+N boottest.pkg
+D 24 Mar 2026
+U 9
+d 'BOOTTEST': module to provide fast execution of the wild bootstrap with null imposed
+d 
+d  boottest is a post-estimation command that offers fast execution
+d of the wild bootstrap (Wu 1986) with null imposed, as recommended
+d by Cameron, Gelbach, and Miller (2008) for estimates with
+d clustered standard errors and few clusters. It also performs the
+d “score bootstrap” (Kline and Santos 2012), which adapts the
+d wild approach to Maximum Likelihood estimators. Two wrappers,
+d waldtest and scoretest, give easy access to the classical Wald
+d (1943) and Rao (1948) score/Lagrange multiplier tests. boottest
+d works after regress, cnsreg, ivreg, ivregress, ivreg2 and most
+d Stata ML-based estimation commands. boottest offers inference
+d based on multi-way clustering after many Stata estimation
+d commands that do not otherwise support it. When bootstrapping, it
+d offers a choice of Rademacher, Mammen (1993), Webb (2014), and
+d standard normal weights. boottest requires Stata version 11.2 or
+d later and runs fastest in version 13 or later.
+d 
+d KW: wild bootstrap
+d KW: Cameron
+d KW: Gelbach
+d KW: Miller
+d KW: score bootstrap
+d KW: Rao LM test
+d KW: multi-way clustering
+d 
+d Requires: Stata version 13
+d 
+d Distribution-Date: 20250620
+d 
+d Author: David Roodman
+d Support: email david@@davidroodman.com
+d 
+f b\boottest.ado
+f b\boottest.mata
+f b\boottest.sthlp
+f b\boottest_1.ado
+f a\artest.ado
+f s\scoretest.ado
+f w\waldtest.ado
+f l\lboottest.mlib
+e
+S http://fmwww.bc.edu/repec/bocode/p
+N psacalc.pkg
+D 24 Mar 2026
+U 10
+d 'PSACALC': module to calculate treatment effects and relative degree of selection under proportional selection of observables and unobservables
+d 
+d  psacalc is performed after linear models to evaluate the
+d possible degree of omitted variable bias under the assumption
+d that the selection on the observed controls is proportional to
+d the selection on the unobserved controls. Details of the
+d calculation and theory are in Oster (2016), JBES, Forthcoming.
+d The command requires the user to identify an independent variable
+d of interest from the regression. The command calculates (1) a
+d value of the relative degree of selection to match a given
+d treatment effect or (2) a value of the treatment effect given a
+d relative degree of selection. Options are given to specify a
+d maximum R-squared in absence of measurement error and a set of
+d observable controls not informative about the observables.
+d 
+d KW: treatment effects
+d KW: bounds
+d KW: selection of observables
+d 
+d Requires: Stata version 12
+d 
+d Distribution-Date: 20161218
+d 
+d Author: Emily Oster, Brown University
+d Support: email emily_oster@@brown.edu
+d 
+f p\psacalc.ado
+f p\psacalc.sthlp
+f p\psacalci.ado
+f p\psacalci.sthlp
+e

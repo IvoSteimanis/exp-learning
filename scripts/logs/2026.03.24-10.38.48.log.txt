@@ -1,0 +1,2193 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/scripts/logs/2026.03.24-10.38.48.log.txt
+  log type:  text
+ opened on:  24 Mar 2026, 10:38:48
+
+. 
+. di "Begin date and time: $S_DATE $S_TIME"
+Begin date and time: 24 Mar 2026 10:38:48
+
+. di "Stata version: `c(stata_version)'"
+Stata version: 19.5
+
+. di "Updated as of: `c(born_date)'"
+Updated as of: 13 Aug 2025
+
+. di "Variant:       `=cond( c(MP),"MP",cond(c(SE),"SE",c(flavor)) )'"
+Variant:       IC
+
+. di "Processors:    `c(processors)'"
+Processors:    1
+
+. di "OS:            `c(os)' `c(osdtl)'"
+OS:            Windows 64-bit
+
+. di "Machine type:  `c(machine_type)'"
+Machine type:  PC (64-bit x86-64)
+
+. 
+. * Analyses were run on MacOS using Stata version 18 (backward compatible to version 16)
+. version 16    // Set Version number for backward compatibility
+
+. 
+. /*******************************************************************************
+> * Install community-contributed packages (version-locked)
+> *******************************************************************************/
+. 
+. * All required ado-files are bundled in /packages so the replication
+. * package runs without internet access and is immune to future package updates.
+. * To refresh or populate the local library, uncomment the block below and run once.
+. 
+. cap mkdir "$projectdir/packages"
+
+. sysdir set PLUS "$projectdir/packages"
+
+. adopath ++ "$projectdir/packages"
+  [1]              "C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages"
+  [2]  (BASE)      "C:\Program Files\StataNow19\ado\base/"
+  [3]  (SITE)      "C:\Program Files\StataNow19\ado\site/"
+  [4]              "."
+  [5]  (PERSONAL)  "c:\ado\personal/"
+  [6]  (PLUS)      "C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages/"
+  [7]  (OLDPLACE)  "c:\ado/"
+
+. 
+. foreach pkg in estout coefplot schemepack stripplot outreg2 ///
+>                mylabels ietoolkit tabout boottest psacalc {
+  2.     cap which `pkg'
+  3.     if _rc ssc install `pkg', replace
+  4. }
+checking estout consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+checking coefplot consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+checking schemepack consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+checking stripplot consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+checking outreg2 consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+checking mylabels consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+checking ietoolkit consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+checking tabout consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+checking boottest consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+checking psacalc consistency and verifying not already installed...
+installing into C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/packages\...
+installation complete.
+
+. 
+. 
+. * Create directories for output files
+. cap mkdir "$projectdir/processed"
+
+. cap mkdir "$projectdir/results"
+
+. cap mkdir "$projectdir/results/intermediate"
+
+. cap mkdir "$projectdir/results/tables"
+
+. cap mkdir "$projectdir/results/figures"
+
+. 
+. /*******************************************************************************
+> * Run processing and analysis scripts
+> *******************************************************************************/
+. 
+. do "$projectdir/scripts/01_clean.do"
+
+. 
+. /*******************************************************************************
+> * Project: Experiential Learning: Evidence from rural Namibia
+> * File:    01_clean.do
+> * Purpose: Merges survey datasets, cleans and generate variables for replication
+> *******************************************************************************/
+. 
+. clear all
+
+. set more off
+
+. 
+. 
+. /*******************************************************************************
+> * 0. Merge / append data
+> *******************************************************************************/
+. 
+. use "$projectdir/data/survey_outcome.dta", clear
+
+. append using "$projectdir/data/survey_followup.dta"
+(variable player_ID was byte, now float to accommodate using data's values)
+(label site_ID_label already defined)
+
+. 
+. * NOTE: force option resolves string/numeric type mismatches between outcome
+. * and general survey files (e.g., gender_female, age, educ_level stored as
+. * string in one file and numeric in another). See string-to-numeric recoding below.
+. merge m:1 site_ID player_ID using ///
+>     "$projectdir/data/survey_general.dta", force
+(label site_ID_label already defined)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                           234
+        from master                        10  (_merge==1)
+        from using                        224  (_merge==2)
+
+    Matched                               532  (_merge==3)
+    -----------------------------------------
+
+.         
+. tab _merge
+
+   Matching result from |
+                  merge |      Freq.     Percent        Cum.
+------------------------+-----------------------------------
+        Master only (1) |         10        1.31        1.31
+         Using only (2) |        224       29.24       30.55
+            Matched (3) |        532       69.45      100.00
+------------------------+-----------------------------------
+                  Total |        766      100.00
+
+. 
+. * Generate individual ID
+. sort site_ID player_ID
+
+. egen ind_ID = group(site_ID player_ID)
+
+. order ind_ID, after(player_ID)
+
+. 
+. 
+. /*******************************************************************************
+> * 1. Harmonize panel and timing variables
+> *******************************************************************************/
+. 
+. * Recode missing followup values: 0 = on-site interview (workshop day), 1 = follow-up interview
+. replace followup = 0 if missing(followup)
+(514 real changes made)
+
+. capture label drop followup_label
+
+. label define followup_label 0 "Workshop day" 1 "Follow-up interview"
+
+. label values followup followup_label
+
+. 
+. * Carry on-site treatment timing forward to follow-up observations
+. bysort ind_ID (time_treat): replace time_treat = time_treat[1] if missing(time_treat)
+(248 real changes made)
+
+. label define time_treat_lbl 0 "Before" 1 "After Game" 2 "After Workshop", replace
+
+. label values time_treat time_treat_lbl
+
+. 
+. * Treatment timing including follow-up for descriptive figures
+. capture drop time4
+
+. gen time4 = time_treat
+(228 missing values generated)
+
+. replace time4 = 3 if followup == 1
+(252 real changes made)
+
+. capture label drop time4_lbl
+
+. label define time4_lbl 0 "Baseline" 1 "T1: Game" 2 "T2: Game + Workshop" 3 "Follow-up" 
+
+. label values time4 time4_lbl
+
+. 
+. * Count number of survey waves per individual
+. by ind_ID: gen n_surveys = _N
+
+. tab n_surveys
+
+  n_surveys |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        270       35.25       35.25
+          2 |        496       64.75      100.00
+------------+-----------------------------------
+      Total |        766      100.00
+
+. 
+. * Attrition variables for follow-up analyses
+. capture drop returned_followup
+
+. capture drop attrited
+
+. bysort ind_ID: egen returned_followup = max(followup == 1)
+
+. gen attrited = returned_followup == 0 if followup == 0
+(252 missing values generated)
+
+. 
+. * Balanced follow-up sample: missing for individuals observed in only one wave
+. gen balanced_followup = followup
+
+. replace balanced_followup = . if n_surveys == 1
+(270 real changes made, 270 to missing)
+
+. label values balanced_followup followup_label
+
+. drop n_surveys
+
+. 
+. /*******************************************************************************
+> * 2. Missing Value Treatment: correction for missing interviews
+> *******************************************************************************/
+. 
+. tab _merge // 224 participants did not take part in the outcome-survey
+
+   Matching result from |
+                  merge |      Freq.     Percent        Cum.
+------------------------+-----------------------------------
+        Master only (1) |         10        1.31        1.31
+         Using only (2) |        224       29.24       30.55
+            Matched (3) |        532       69.45      100.00
+------------------------+-----------------------------------
+                  Total |        766      100.00
+
+. drop if _merge == 2
+(224 observations deleted)
+
+. 
+. tab _merge time_treat // 7 participants have been been interviewed in outcome, but not general survey
+
+ Matching result from |      Time variable on-site
+                merge |    Before  After Gam  After Wor |     Total
+----------------------+---------------------------------+----------
+      Master only (1) |         6          0          4 |        10 
+          Matched (3) |       173        177        178 |       528 
+----------------------+---------------------------------+----------
+                Total |       179        177        182 |       538 
+
+. tab _merge followup // 3 participants have been interviewed in followup, but not general survey
+
+                      |  Follow-up interview
+                      |    (8months after
+ Matching result from |     intervention)
+                merge | Workshop   Follow-up |     Total
+----------------------+----------------------+----------
+      Master only (1) |         7          3 |        10 
+          Matched (3) |       283        249 |       532 
+----------------------+----------------------+----------
+                Total |       290        252 |       542 
+
+. drop _merge
+
+. 
+. tab time_treat, missing // 4 participants are interviewed at follow-up but not on workshop day
+
+ Time variable |
+       on-site |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+        Before |        179       33.03       33.03
+    After Game |        177       32.66       65.68
+After Workshop |        182       33.58       99.26
+             . |          4        0.74      100.00
+---------------+-----------------------------------
+         Total |        542      100.00
+
+. drop if missing(time_treat)
+(4 observations deleted)
+
+. 
+. duplicates list ind_ID followup
+
+Duplicates in terms of ind_ID followup
+
+(0 observations are duplicates)
+
+. 
+. 
+. /*******************************************************************************
+> * 3. Common label definitions
+> *******************************************************************************/
+. 
+. capture label define yesno                      0 "No" 1 "Yes", replace
+
+. capture label define gender_lbl                 0 "Male" 1 "Female", replace
+
+. capture label define age_lbl                    1 "Youth (18-24)" ///
+>                                                                                         2 "Young adults (25-34)" ///
+>                                                                                         3 "Adults (35-64)" ///
+>                                                                                         4 "Older adults (+65)", replace
+
+. capture label define marital_lbl                1 "Single" 2 "Married" ///
+>                                                                                         3 "Divorced" 4 "Widowed", replace
+
+. capture label define educ_lbl                   0 "None" 1 "Adult literacy" ///
+>                                                                                         2 "Lower primary school" ///
+>                                                                                         3 "Upper primary school" ///
+>                                                                                         4 "Junior secondary school" ///
+>                                                                                         5 "Senior secondary school" ///
+>                                                                                         6 "College" 7 "University", replace
+
+. capture label define educ_group_lbl             1 "Low education (max primary school)" ///
+>                                                                                         2 "Medium education (secondary school)" ///
+>                                                                                         3 "High education (college/university)", replace
+
+. capture label define adapt_effort_lbl           0 "No efforts" ///
+>                                                                                         1 "By myself or my family" ///
+>                                                                                         2 "By community", replace
+
+. capture label define respon_group_lbl           1 "Internal (individual/family/community)" ///
+>                                                                                         2 "Both" 3 "External (organization/government)", replace
+
+. capture label define trust_lbl                  0 "No one" 1 "Very few" ///
+>                                                                                         2 "More than half" 3 "Almost everyone", replace
+
+. capture label define foodfreq_lbl               0 "Never" ///
+>                                                                                         1 "Some months but not every month" ///
+>                                                                                         2 "Almost every month" ///
+>                                                                                         3 "Almost every week" ///
+>                                                                                         4 "Almost every day", replace
+
+. capture label define severity_lbl               1 "Not serious at all" ///
+>                                                                                         2 "Rather not serious" ///
+>                                                                                         3 "Neither serious nor not serious" ///
+>                                                                                         4 "Rather serious" ///
+>                                                                                         5 "Very serious", replace
+
+. capture label define agree_lbl                  1 "Strongly disagree" 2 "Disagree" ///
+>                                                                                         3 "Neutral" 4 "Agree" ///
+>                                                                                         5 "Strongly agree", replace
+
+. capture label define intergen_approval_lbl      1 "Strongly people today" ///
+>                                                                                         2 "Rather people today" ///
+>                                                                                         3 "Both" ///
+>                                                                                         4 "Rather people in the future" ///
+>                                                                                         5 "Strongly people in the future", replace
+
+. capture label define intergen_concern_lbl       1 "Strongly immediate concerns" ///
+>                                                                                         2 "Rather immediate concerns" ///
+>                                                                                         3 "Both" ///
+>                                                                                         4 "Rather future concerns" ///
+>                                                                                         5 "Strongly future concerns", replace
+
+. capture label define both_future_lbl            0 "Future only" 1 "Both", replace
+
+. 
+. 
+. /*******************************************************************************
+> * 4. Clean general variables
+> *******************************************************************************/
+. 
+. * Gender
+. capture confirm numeric variable gender_female
+
+. if _rc {
+.     replace gender_female = "1" if gender_female == "Female"
+(303 real changes made)
+.     replace gender_female = "0" if gender_female == "Male"
+(225 real changes made)
+.     destring gender_female, replace
+gender_female: all characters numeric; replaced as byte
+(10 missing values generated)
+. }
+
+. label values gender_female yesno
+
+. 
+. * Age
+. capture confirm string variable age
+
+. if !_rc {
+.     replace age = "1" if age == "youth (18-24)"
+(57 real changes made)
+.     replace age = "2" if age == "young adults (25-34)"
+(175 real changes made)
+.     replace age = "3" if age == "adults (35-64)"
+(265 real changes made)
+.     replace age = "4" if age == "older adults (+65)"
+(29 real changes made)
+.     destring age, replace
+age: all characters numeric; replaced as byte
+(12 missing values generated)
+. }
+
+. label values age age_lbl
+
+. 
+. gen age_above34 = inlist(age, 3, 4) if !missing(age)
+(12 missing values generated)
+
+. label values age_above34 yesno
+
+. label var age_above34 "Age above 34"
+
+. 
+. * Marital status
+. capture confirm string variable maritalstatus
+
+. if !_rc {
+.     replace maritalstatus = "1" if maritalstatus == "Single"
+(329 real changes made)
+.     replace maritalstatus = "2" if maritalstatus == "Married"
+(177 real changes made)
+.     replace maritalstatus = "3" if maritalstatus == "Divorced"
+(4 real changes made)
+.     replace maritalstatus = "4" if maritalstatus == "Widowed"
+(14 real changes made)
+.     destring maritalstatus, replace
+maritalstatus: all characters numeric; replaced as byte
+(14 missing values generated)
+. }
+
+. label values maritalstatus marital_lbl
+
+. 
+. gen married = maritalstatus == 2 if !missing(maritalstatus)
+(14 missing values generated)
+
+. label values married yesno
+
+. 
+. * Education
+. capture confirm string variable educ_level
+
+. if !_rc {
+.     replace educ_level = "0" if educ_level == "None"
+(6 real changes made)
+.     replace educ_level = "1" if educ_level == "Adult literacy"
+(5 real changes made)
+.     replace educ_level = "2" if educ_level == "Lower primary school"
+(8 real changes made)
+.     replace educ_level = "3" if educ_level == "Upper primary school"
+(26 real changes made)
+.     replace educ_level = "4" if educ_level == "Junior secondary school"
+(194 real changes made)
+.     replace educ_level = "5" if educ_level == "Senior secondary school"
+(217 real changes made)
+.     replace educ_level = "6" if educ_level == "College"
+(18 real changes made)
+.     replace educ_level = "7" if educ_level == "University"
+(50 real changes made)
+.     destring educ_level, replace
+educ_level: all characters numeric; replaced as byte
+(14 missing values generated)
+. }
+
+. label values educ_level educ_lbl
+
+. 
+. gen educ_level_group = .
+(538 missing values generated)
+
+. replace educ_level_group = 1 if inlist(educ_level, 0, 1, 2, 3)
+(45 real changes made)
+
+. replace educ_level_group = 2 if inlist(educ_level, 4, 5)
+(411 real changes made)
+
+. replace educ_level_group = 3 if inlist(educ_level, 6, 7)
+(68 real changes made)
+
+. label values educ_level_group educ_group_lbl
+
+. 
+. tab educ_level_group, gen(educ_level_group_)
+
+                   educ_level_group |      Freq.     Percent        Cum.
+------------------------------------+-----------------------------------
+ Low education (max primary school) |         45        8.59        8.59
+Medium education (secondary school) |        411       78.44       87.02
+High education (college/university) |         68       12.98      100.00
+------------------------------------+-----------------------------------
+                              Total |        524      100.00
+
+. rename educ_level_group_1 educ_level_low
+
+. rename educ_level_group_2 educ_level_mid 
+
+. rename educ_level_group_3 educ_level_high
+
+. 
+. 
+. * Number of children
+. capture confirm numeric variable log_num_children
+
+. if _rc {
+.     gen log_num_children = log(num_children)
+(40 missing values generated)
+. }
+
+. 
+. * Income
+. capture confirm numeric variable income_employed
+
+. if _rc {
+.     egen income_employed = rowmax(income_wagelabor income_farmwagelabor income_salary)
+(14 missing values generated)
+. }
+
+. capture confirm numeric variable income_farming
+
+. if _rc {
+.     egen income_farming = rowmax(income_irfarming income_rainfedfarming income_animalhusb)
+(14 missing values generated)
+. }
+
+. 
+. capture drop income_pca1 income_pca2
+
+. pca income_employed income_farming income_business income_remittances
+
+Principal components/correlation                 Number of obs    =        524
+                                                 Number of comp.  =          4
+                                                 Trace            =          4
+    Rotation: (unrotated = principal)            Rho              =     1.0000
+
+    --------------------------------------------------------------------------
+       Component |   Eigenvalue   Difference         Proportion   Cumulative
+    -------------+------------------------------------------------------------
+           Comp1 |      1.28371      .260475             0.3209       0.3209
+           Comp2 |      1.02323     .0109419             0.2558       0.5767
+           Comp3 |      1.01229      .331524             0.2531       0.8298
+           Comp4 |      .680768            .             0.1702       1.0000
+    --------------------------------------------------------------------------
+
+Principal components (eigenvectors) 
+
+    --------------------------------------------------------------------
+        Variable |    Comp1     Comp2     Comp3     Comp4 | Unexplained 
+    -------------+----------------------------------------+-------------
+    income_emp~d |  -0.7261   -0.0596    0.0170    0.6847 |           0 
+    income_far~g |   0.5002   -0.4944   -0.5054    0.5000 |           0 
+    income_bus~s |   0.2244    0.8669   -0.3083    0.3211 |           0 
+    income_rem~s |   0.4150    0.0228    0.8057    0.4220 |           0 
+    --------------------------------------------------------------------
+
+. predict income_pca1 income_pca2
+(score assumed)
+(2 components skipped)
+
+Scoring coefficients 
+    sum of squares(column-loading) = 1
+
+    ------------------------------------------------------
+        Variable |    Comp1     Comp2     Comp3     Comp4 
+    -------------+----------------------------------------
+    income_emp~d |  -0.7261   -0.0596    0.0170    0.6847 
+    income_far~g |   0.5002   -0.4944   -0.5054    0.5000 
+    income_bus~s |   0.2244    0.8669   -0.3083    0.3211 
+    income_rem~s |   0.4150    0.0228    0.8057    0.4220 
+    ------------------------------------------------------
+
+. 
+. * Assets
+. foreach v of varlist assets_radio assets_television assets_smartphone ///
+>                     assets_fan assets_solarpower assets_generator assets_car {
+  2.     capture confirm string variable `v'
+  3.     if !_rc {
+  4.         replace `v' = subinstr(`v', " (zero)",  "", .)
+  5.         replace `v' = subinstr(`v', " (one)",   "", .)
+  6.         replace `v' = subinstr(`v', " (two)",   "", .)
+  7.         replace `v' = subinstr(`v', " (three)", "", .)
+  8.         replace `v' = subinstr(`v', " (four)",  "", .)
+  9.         replace `v' = subinstr(`v', " (five)",  "", .)
+ 10.         destring `v', replace
+ 11.     }
+ 12. }
+(319 real changes made)
+(191 real changes made)
+(12 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+assets_radio: all characters numeric; replaced as byte
+(16 missing values generated)
+(388 real changes made)
+(117 real changes made)
+(10 real changes made)
+(1 real change made)
+(0 real changes made)
+(0 real changes made)
+assets_television: all characters numeric; replaced as byte
+(22 missing values generated)
+(284 real changes made)
+(212 real changes made)
+(20 real changes made)
+(4 real changes made)
+(4 real changes made)
+(0 real changes made)
+assets_smartphone: all characters numeric; replaced as byte
+(14 missing values generated)
+(455 real changes made)
+(51 real changes made)
+(4 real changes made)
+(0 real changes made)
+(2 real changes made)
+(0 real changes made)
+assets_fan: all characters numeric; replaced as byte
+(26 missing values generated)
+(411 real changes made)
+(91 real changes made)
+(13 real changes made)
+(4 real changes made)
+(3 real changes made)
+(0 real changes made)
+assets_solarpower: all characters numeric; replaced as byte
+(16 missing values generated)
+(486 real changes made)
+(31 real changes made)
+(1 real change made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+assets_generator: all characters numeric; replaced as byte
+(20 missing values generated)
+(466 real changes made)
+(37 real changes made)
+(10 real changes made)
+(7 real changes made)
+(0 real changes made)
+(0 real changes made)
+assets_car: all characters numeric; replaced as byte
+(18 missing values generated)
+
+. 
+. capture drop assets_pca1 assets_pca2
+
+. pca assets_radio assets_television assets_smartphone assets_fan ///
+>     assets_solarpower assets_generator assets_car
+
+Principal components/correlation                 Number of obs    =        493
+                                                 Number of comp.  =          7
+                                                 Trace            =          7
+    Rotation: (unrotated = principal)            Rho              =     1.0000
+
+    --------------------------------------------------------------------------
+       Component |   Eigenvalue   Difference         Proportion   Cumulative
+    -------------+------------------------------------------------------------
+           Comp1 |      2.69745      1.57472             0.3853       0.3853
+           Comp2 |      1.12273      .213109             0.1604       0.5457
+           Comp3 |      .909621      .200621             0.1299       0.6757
+           Comp4 |         .709     .0255123             0.1013       0.7770
+           Comp5 |      .683488      .179527             0.0976       0.8746
+           Comp6 |      .503961      .130207             0.0720       0.9466
+           Comp7 |      .373754            .             0.0534       1.0000
+    --------------------------------------------------------------------------
+
+Principal components (eigenvectors) 
+
+    --------------------------------------------------------------------------------------------------
+        Variable |    Comp1     Comp2     Comp3     Comp4     Comp5     Comp6     Comp7 | Unexplained 
+    -------------+----------------------------------------------------------------------+-------------
+    assets_radio |   0.4203   -0.0521   -0.1082    0.1605   -0.7814   -0.2728    0.3132 |           0 
+    assets_tel~n |   0.4964   -0.1943    0.0790   -0.2387   -0.0971   -0.0124   -0.8019 |           0 
+    assets_sma~e |   0.3034   -0.1341    0.7279    0.5515    0.1990    0.0767    0.1026 |           0 
+      assets_fan |   0.3727   -0.5303   -0.1811   -0.3061    0.1819    0.5082    0.4025 |           0 
+    assets_sol~r |   0.3042    0.6307   -0.2747    0.2897   -0.0192    0.5855   -0.0845 |           0 
+    assets_gen~r |   0.3061    0.5120    0.3779   -0.6133    0.1267   -0.1864    0.2728 |           0 
+      assets_car |   0.3997    0.0201   -0.4485    0.2438    0.5393   -0.5326    0.0688 |           0 
+    --------------------------------------------------------------------------------------------------
+
+. predict assets_pca1 assets_pca2
+(score assumed)
+(5 components skipped)
+
+Scoring coefficients 
+    sum of squares(column-loading) = 1
+
+    ------------------------------------------------------------------------------------
+        Variable |    Comp1     Comp2     Comp3     Comp4     Comp5     Comp6     Comp7 
+    -------------+----------------------------------------------------------------------
+    assets_radio |   0.4203   -0.0521   -0.1082    0.1605   -0.7814   -0.2728    0.3132 
+    assets_tel~n |   0.4964   -0.1943    0.0790   -0.2387   -0.0971   -0.0124   -0.8019 
+    assets_sma~e |   0.3034   -0.1341    0.7279    0.5515    0.1990    0.0767    0.1026 
+      assets_fan |   0.3727   -0.5303   -0.1811   -0.3061    0.1819    0.5082    0.4025 
+    assets_sol~r |   0.3042    0.6307   -0.2747    0.2897   -0.0192    0.5855   -0.0845 
+    assets_gen~r |   0.3061    0.5120    0.3779   -0.6133    0.1267   -0.1864    0.2728 
+      assets_car |   0.3997    0.0201   -0.4485    0.2438    0.5393   -0.5326    0.0688 
+    ------------------------------------------------------------------------------------
+
+. 
+. * Trust
+. capture confirm string variable trust_community
+
+. if !_rc {
+.     replace trust_community = "0" if trust_community == "No One"
+(50 real changes made)
+.     replace trust_community = "1" if trust_community == "Very Few"
+(429 real changes made)
+.     replace trust_community = "2" if trust_community == "More than half"
+(31 real changes made)
+.     replace trust_community = "3" if trust_community == "Almost Everyone"
+(18 real changes made)
+.     destring trust_community, replace
+trust_community: all characters numeric; replaced as byte
+(10 missing values generated)
+. }
+
+. label values trust_community trust_lbl
+
+. 
+. gen trust_high = inlist(trust_community, 2, 3) if !missing(trust_community)
+(10 missing values generated)
+
+. label values trust_high yesno
+
+. 
+. * Food insecurity
+. capture confirm string variable food_insec
+
+. if !_rc {
+.     replace food_insec = "0" if food_insec == "No"
+(46 real changes made)
+.     replace food_insec = "1" if food_insec == "Yes"
+(478 real changes made)
+.     destring food_insec, replace
+food_insec: all characters numeric; replaced as byte
+(14 missing values generated)
+. }
+
+. label values food_insec yesno
+
+. 
+. capture confirm string variable food_insec_frequency
+
+. if !_rc {
+.     replace food_insec_frequency = "0" if food_insec_frequency == "never"
+(22 real changes made)
+.     replace food_insec_frequency = "1" if food_insec_frequency == "some months but not every month"
+(176 real changes made)
+.     replace food_insec_frequency = "2" if food_insec_frequency == "almost every month"
+(135 real changes made)
+.     replace food_insec_frequency = "3" if food_insec_frequency == "almost every week"
+(140 real changes made)
+.     replace food_insec_frequency = "4" if food_insec_frequency == "almost every day"
+(29 real changes made)
+.     destring food_insec_frequency, replace
+food_insec_frequency: all characters numeric; replaced as byte
+(36 missing values generated)
+. }
+
+. label values food_insec_frequency foodfreq_lbl
+
+. 
+. gen food_insec_month = inlist(food_insec_frequency, 2, 3, 4) if !missing(food_insec_frequency)
+(36 missing values generated)
+
+. label values food_insec_month yesno
+
+. 
+. * Leader
+. capture confirm numeric variable leader
+
+. if _rc {
+.     gen leader = role_community == 1 if !missing(role_community)
+(10 missing values generated)
+. }
+
+. label values leader yesno
+
+. 
+. capture confirm numeric variable role_community_dum
+
+. if _rc {
+.     gen role_community_dum = role_community >= 1 if !missing(role_community)
+(10 missing values generated)
+. }
+
+. label values role_community_dum yesno
+
+. 
+. capture confirm numeric variable role_gov
+
+. if _rc {
+.     gen role_gov = inlist(role_community, 1, 2) if !missing(role_community)
+(10 missing values generated)
+. }
+
+. label values role_gov yesno
+
+. 
+. * Adaptation effort grouping
+. foreach v of varlist adapt_effort_myself adapt_effort_family adapt_effort_community ///
+>                     adapt_effort_no adapt_effort_na respon_individual respon_family ///
+>                     respon_community respon_organization respon_government respon_dk {
+  2.     capture confirm string variable `v'
+  3.     if !_rc {
+  4.         replace `v' = "0" if `v' == "No"
+  5.         replace `v' = "1" if `v' == "Yes"
+  6.         destring `v', replace
+  7.     }
+  8.     capture label values `v' yesno
+  9. }
+
+. 
+. gen adapt_effort_group = .
+(538 missing values generated)
+
+. replace adapt_effort_group = 0 if adapt_effort_no == 1 | adapt_effort_na == 1
+(272 real changes made)
+
+. replace adapt_effort_group = 1 if adapt_effort_family == 1 | adapt_effort_myself == 1
+(188 real changes made)
+
+. replace adapt_effort_group = 2 if adapt_effort_community == 1
+(75 real changes made)
+
+. label values adapt_effort_group adapt_effort_lbl
+
+. 
+. drop adapt_effort
+
+. 
+. * Responsibility
+. gen respon_group = .
+(538 missing values generated)
+
+. replace respon_group = 1 if respon_individual == 1 | respon_family == 1 | respon_community == 1
+(287 real changes made)
+
+. replace respon_group = 3 if respon_organization == 1 | respon_government == 1
+(443 real changes made)
+
+. replace respon_group = 2 if (respon_individual == 1 | respon_family == 1 | respon_community == 1) & ///
+>                          (respon_organization == 1 | respon_government == 1)
+(208 real changes made)
+
+. label values respon_group respon_group_lbl
+
+. 
+. gen respon_external = respon_group == 3 if !missing(respon_group)
+(16 missing values generated)
+
+. drop responsibility
+
+. 
+. /*******************************************************************************
+> * 5. Clean appended outcome/follow-up variables jointly
+> *******************************************************************************/
+. 
+. * Likert scale items
+. 
+. foreach v of varlist severity3 severity4 {
+  2.         capture confirm string variable `v'
+  3.     if !_rc {
+  4.         replace `v' = "1" if `v' == "not serious at all"
+  5.         replace `v' = "2" if `v' == "rather not serious"
+  6.         replace `v' = "3" if `v' == "neither serious, nor not serious"
+  7.         replace `v' = "4" if `v' == "rather serious"
+  8.         replace `v' = "5" if `v' == "very serious"
+  9.         destring `v', replace
+ 10.     }
+ 11.     capture label values `v' severity_lbl
+ 12. }
+(3 real changes made)
+(5 real changes made)
+(17 real changes made)
+(58 real changes made)
+(454 real changes made)
+severity3: all characters numeric; replaced as byte
+(1 missing value generated)
+(12 real changes made)
+(11 real changes made)
+(45 real changes made)
+(99 real changes made)
+(370 real changes made)
+severity4: all characters numeric; replaced as byte
+(1 missing value generated)
+
+. 
+. foreach v of varlist selfeff_impact selfeff_willigness ///
+>                     selfeff_knowledge selfeff_ability selfeff_opportunities ///
+>                     selfeff_skills outeff1 outeff2 cost_monetary cost_time ///
+>                     intergen_empathy intergen_image adapt_info_strat ///
+>                     adapt_info_impact {
+  2.     capture confirm string variable `v'
+  3.     if !_rc {
+  4.         replace `v' = "1" if `v' == "strongly disagree"
+  5.         replace `v' = "2" if `v' == "disagree"
+  6.         replace `v' = "3" if `v' == "neutral"
+  7.         replace `v' = "4" if `v' == "agree"
+  8.         replace `v' = "5" if `v' == "strongly agree"
+  9.         destring `v', replace
+ 10.     }
+ 11.     capture label values `v' agree_lbl
+ 12. }
+(0 real changes made)
+(6 real changes made)
+(60 real changes made)
+(257 real changes made)
+(214 real changes made)
+selfeff_impact: all characters numeric; replaced as byte
+(1 missing value generated)
+(0 real changes made)
+(4 real changes made)
+(23 real changes made)
+(229 real changes made)
+(279 real changes made)
+selfeff_willigness: all characters numeric; replaced as byte
+(3 missing values generated)
+(0 real changes made)
+(38 real changes made)
+(63 real changes made)
+(284 real changes made)
+(152 real changes made)
+selfeff_knowledge: all characters numeric; replaced as byte
+(1 missing value generated)
+(2 real changes made)
+(8 real changes made)
+(43 real changes made)
+(249 real changes made)
+(233 real changes made)
+selfeff_ability: all characters numeric; replaced as byte
+(3 missing values generated)
+(5 real changes made)
+(56 real changes made)
+(146 real changes made)
+(187 real changes made)
+(138 real changes made)
+selfeff_opportunities: all characters numeric; replaced as byte
+(6 missing values generated)
+(4 real changes made)
+(39 real changes made)
+(127 real changes made)
+(216 real changes made)
+(146 real changes made)
+selfeff_skills: all characters numeric; replaced as byte
+(6 missing values generated)
+(87 real changes made)
+(120 real changes made)
+(67 real changes made)
+(152 real changes made)
+(108 real changes made)
+outeff1: all characters numeric; replaced as byte
+(4 missing values generated)
+(29 real changes made)
+(128 real changes made)
+(52 real changes made)
+(215 real changes made)
+(112 real changes made)
+outeff2: all characters numeric; replaced as byte
+(2 missing values generated)
+(95 real changes made)
+(117 real changes made)
+(75 real changes made)
+(154 real changes made)
+(95 real changes made)
+cost_monetary: all characters numeric; replaced as byte
+(2 missing values generated)
+(212 real changes made)
+(272 real changes made)
+(19 real changes made)
+(24 real changes made)
+(7 real changes made)
+cost_time: all characters numeric; replaced as byte
+(4 missing values generated)
+(0 real changes made)
+(4 real changes made)
+(6 real changes made)
+(204 real changes made)
+(322 real changes made)
+intergen_empathy: all characters numeric; replaced as byte
+(2 missing values generated)
+(0 real changes made)
+(0 real changes made)
+(18 real changes made)
+(253 real changes made)
+(267 real changes made)
+intergen_image: all characters numeric; replaced as byte
+(0 real changes made)
+(2 real changes made)
+(8 real changes made)
+(119 real changes made)
+(403 real changes made)
+adapt_info_strat: all characters numeric; replaced as byte
+(6 missing values generated)
+(1 real change made)
+(1 real change made)
+(2 real changes made)
+(201 real changes made)
+(329 real changes made)
+adapt_info_impact: all characters numeric; replaced as byte
+(4 missing values generated)
+
+. 
+. 
+. foreach v of varlist intergen_approval {
+  2.     capture confirm string variable `v'
+  3.     if !_rc {
+  4.         replace `v' = "1" if `v' == "1 strongly people today"
+  5.         replace `v' = "2" if `v' == "2 rather people today"
+  6.         replace `v' = "3" if `v' == "3 both"
+  7.         replace `v' = "4" if `v' == "4 rather people in the future"
+  8.         replace `v' = "5" if `v' == "5 strongly people in the future"
+  9.         destring `v', replace
+ 10.     }
+ 11.     capture label values `v' intergen_approval_lbl
+ 12. }
+(5 real changes made)
+(9 real changes made)
+(329 real changes made)
+(92 real changes made)
+(102 real changes made)
+intergen_approval: all characters numeric; replaced as byte
+(1 missing value generated)
+
+. 
+. foreach v of varlist intergen_concern {
+  2.     capture confirm string variable `v'
+  3.     if !_rc {
+  4.         replace `v' = "1" if `v' == "1 strongly immediate concerns"
+  5.         replace `v' = "2" if `v' == "2 rather immediate concerns"
+  6.         replace `v' = "3" if `v' == "3 both"
+  7.         * NOTE: The survey form mislabeled option 4 as "rather immediate concerns";
+.         * the correct scale direction is "rather future concerns". Both strings map to 4.
+.         replace `v' = "4" if `v' == "4 rather future concerns" | `v' == "4 rather immediate concerns"
+  8.         replace `v' = "5" if `v' == "5 strongly future concerns"
+  9.         destring `v', replace force
+ 10.     }
+ 11.     capture label values `v' intergen_concern_lbl
+ 12. }
+(11 real changes made)
+(10 real changes made)
+(294 real changes made)
+(49 real changes made)
+(173 real changes made)
+intergen_concern: all characters numeric; replaced as byte
+(1 missing value generated)
+
+. 
+. * Ladder of life
+. foreach v of varlist ladder_today ladder_parents ladder_10years ///
+>                     ladder_children ladder_futuregen {
+  2.     capture confirm string variable `v'
+  3.     if !_rc {
+  4.         forvalues i = 0/10 {
+  5.             local word : word `=`i'+1' of zero one two three four five six seven eight nine ten
+  6.             replace `v' = "`i'" if `v' == "`i' (`word')"
+  7.         }
+  8.         destring `v', replace
+  9.     }
+ 10. }
+(23 real changes made)
+(29 real changes made)
+(83 real changes made)
+(89 real changes made)
+(34 real changes made)
+(28 real changes made)
+(4 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+ladder_today: all characters numeric; replaced as byte
+(248 missing values generated)
+(22 real changes made)
+(56 real changes made)
+(48 real changes made)
+(43 real changes made)
+(33 real changes made)
+(41 real changes made)
+(5 real changes made)
+(1 real change made)
+(2 real changes made)
+(2 real changes made)
+(3 real changes made)
+ladder_parents: all characters numeric; replaced as byte
+(282 missing values generated)
+(2 real changes made)
+(2 real changes made)
+(1 real change made)
+(5 real changes made)
+(26 real changes made)
+(97 real changes made)
+(56 real changes made)
+(39 real changes made)
+(25 real changes made)
+(10 real changes made)
+(24 real changes made)
+ladder_10years: all characters numeric; replaced as byte
+(251 missing values generated)
+(1 real change made)
+(1 real change made)
+(0 real changes made)
+(2 real changes made)
+(4 real changes made)
+(33 real changes made)
+(46 real changes made)
+(82 real changes made)
+(42 real changes made)
+(31 real changes made)
+(48 real changes made)
+ladder_children: all characters numeric; replaced as byte
+(248 missing values generated)
+(2 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(5 real changes made)
+(34 real changes made)
+(36 real changes made)
+(41 real changes made)
+(66 real changes made)
+(55 real changes made)
+(51 real changes made)
+ladder_futuregen: all characters numeric; replaced as byte
+(248 missing values generated)
+
+. 
+. * Median SES cut-point and indicator
+. 
+. egen median_SES = median(ladder_today)
+
+. gen SES_above_median = ladder_today >= median_SES if followup == 0
+(248 missing values generated)
+
+. label values SES_above_median yesno
+
+. 
+. 
+. /*******************************************************************************
+> * 6. Generate derived variables and indices for analysis
+> *******************************************************************************/
+. 
+. * PCA indices
+. * NOTE: PCA loadings are estimated on baseline (T0) observations only to avoid
+. * post-treatment contamination (treatment-induced shifts in variance/covariance
+. * would otherwise feed back into the factor loadings that define outcomes).
+. * The `predict` command after PCA applies baseline-estimated loadings to all waves.
+. 
+. * Threat appraisal: PC1 retained (4 items)
+. pca severity1_climate severity2_climate severity3 severity4 if time_treat == 0
+
+Principal components/correlation                 Number of obs    =        179
+                                                 Number of comp.  =          4
+                                                 Trace            =          4
+    Rotation: (unrotated = principal)            Rho              =     1.0000
+
+    --------------------------------------------------------------------------
+       Component |   Eigenvalue   Difference         Proportion   Cumulative
+    -------------+------------------------------------------------------------
+           Comp1 |      1.53118      .158302             0.3828       0.3828
+           Comp2 |      1.37287      .767963             0.3432       0.7260
+           Comp3 |      .604911      .113873             0.1512       0.8772
+           Comp4 |      .491038            .             0.1228       1.0000
+    --------------------------------------------------------------------------
+
+Principal components (eigenvectors) 
+
+    --------------------------------------------------------------------
+        Variable |    Comp1     Comp2     Comp3     Comp4 | Unexplained 
+    -------------+----------------------------------------+-------------
+    severity1~te |   0.2913    0.6458    0.6817    0.1825 |           0 
+    severity2~te |   0.3793    0.5839   -0.7177    0.0093 |           0 
+       severity3 |   0.6599   -0.2472    0.1386   -0.6959 |           0 
+       severity4 |   0.5796   -0.4252   -0.0307    0.6945 |           0 
+    --------------------------------------------------------------------
+
+. predict threat_pca1
+(score assumed)
+(3 components skipped)
+
+Scoring coefficients 
+    sum of squares(column-loading) = 1
+
+    ------------------------------------------------------
+        Variable |    Comp1     Comp2     Comp3     Comp4 
+    -------------+----------------------------------------
+    severity1~te |   0.2913    0.6458    0.6817    0.1825 
+    severity2~te |   0.3793    0.5839   -0.7177    0.0093 
+       severity3 |   0.6599   -0.2472    0.1386   -0.6959 
+       severity4 |   0.5796   -0.4252   -0.0307    0.6945 
+    ------------------------------------------------------
+
+. 
+. * Self-efficacy: PC1 retained (4 items)
+. pca selfeff_knowledge selfeff_ability selfeff_opportunities selfeff_skills if time_treat == 0
+
+Principal components/correlation                 Number of obs    =        175
+                                                 Number of comp.  =          4
+                                                 Trace            =          4
+    Rotation: (unrotated = principal)            Rho              =     1.0000
+
+    --------------------------------------------------------------------------
+       Component |   Eigenvalue   Difference         Proportion   Cumulative
+    -------------+------------------------------------------------------------
+           Comp1 |      2.12137      1.26958             0.5303       0.5303
+           Comp2 |      .851798      .180293             0.2129       0.7433
+           Comp3 |      .671505      .316184             0.1679       0.9112
+           Comp4 |      .355322            .             0.0888       1.0000
+    --------------------------------------------------------------------------
+
+Principal components (eigenvectors) 
+
+    --------------------------------------------------------------------
+        Variable |    Comp1     Comp2     Comp3     Comp4 | Unexplained 
+    -------------+----------------------------------------+-------------
+    selfeff_kn~e |   0.4801    0.2117    0.8251   -0.2092 |           0 
+    selfeff_ab~y |   0.4062    0.7901   -0.3703    0.2712 |           0 
+    selfeff_op~s |   0.5598   -0.2607   -0.4264   -0.6609 |           0 
+    selfeff_sk~s |   0.5395   -0.5127   -0.0131    0.6677 |           0 
+    --------------------------------------------------------------------
+
+. predict selfeff_pca1
+(score assumed)
+(3 components skipped)
+
+Scoring coefficients 
+    sum of squares(column-loading) = 1
+
+    ------------------------------------------------------
+        Variable |    Comp1     Comp2     Comp3     Comp4 
+    -------------+----------------------------------------
+    selfeff_kn~e |   0.4801    0.2117    0.8251   -0.2092 
+    selfeff_ab~y |   0.4062    0.7901   -0.3703    0.2712 
+    selfeff_op~s |   0.5598   -0.2607   -0.4264   -0.6609 
+    selfeff_sk~s |   0.5395   -0.5127   -0.0131    0.6677 
+    ------------------------------------------------------
+
+. 
+. * Outcome-efficacy: PC1 retained (2 items); sign flipped so that higher values
+. * indicate greater perceived efficacy (raw PC1 loads negatively on outeff1)
+. pca outeff1 outeff2 if time_treat == 0
+
+Principal components/correlation                 Number of obs    =        178
+                                                 Number of comp.  =          2
+                                                 Trace            =          2
+    Rotation: (unrotated = principal)            Rho              =     1.0000
+
+    --------------------------------------------------------------------------
+       Component |   Eigenvalue   Difference         Proportion   Cumulative
+    -------------+------------------------------------------------------------
+           Comp1 |      1.27971       .55942             0.6399       0.6399
+           Comp2 |       .72029            .             0.3601       1.0000
+    --------------------------------------------------------------------------
+
+Principal components (eigenvectors) 
+
+    ------------------------------------------------
+        Variable |    Comp1     Comp2 | Unexplained 
+    -------------+--------------------+-------------
+         outeff1 |  -0.7071    0.7071 |           0 
+         outeff2 |   0.7071    0.7071 |           0 
+    ------------------------------------------------
+
+. predict outeff_pca
+(score assumed)
+(1 components skipped)
+
+Scoring coefficients 
+    sum of squares(column-loading) = 1
+
+    ----------------------------------
+        Variable |    Comp1     Comp2 
+    -------------+--------------------
+         outeff1 |  -0.7071           
+         outeff2 |   0.7071    0.7071 
+    ----------------------------------
+
+. gen outeff_pca1 = -1 * outeff_pca
+(4 missing values generated)
+
+. 
+. * Perceived costs: PC1 retained (2 items)
+. pca cost_monetary cost_time if time_treat == 0
+
+Principal components/correlation                 Number of obs    =        177
+                                                 Number of comp.  =          2
+                                                 Trace            =          2
+    Rotation: (unrotated = principal)            Rho              =     1.0000
+
+    --------------------------------------------------------------------------
+       Component |   Eigenvalue   Difference         Proportion   Cumulative
+    -------------+------------------------------------------------------------
+           Comp1 |      1.35981      .719612             0.6799       0.6799
+           Comp2 |      .640194            .             0.3201       1.0000
+    --------------------------------------------------------------------------
+
+Principal components (eigenvectors) 
+
+    ------------------------------------------------
+        Variable |    Comp1     Comp2 | Unexplained 
+    -------------+--------------------+-------------
+    cost_monet~y |   0.7071    0.7071 |           0 
+       cost_time |   0.7071   -0.7071 |           0 
+    ------------------------------------------------
+
+. predict perc_cost_pca1
+(score assumed)
+(1 components skipped)
+
+Scoring coefficients 
+    sum of squares(column-loading) = 1
+
+    ----------------------------------
+        Variable |    Comp1     Comp2 
+    -------------+--------------------
+    cost_monet~y |   0.7071           
+       cost_time |   0.7071   -0.7071 
+    ----------------------------------
+
+. 
+. * Standardized and normalized indices
+. 
+. foreach var in threat_pca1 selfeff_pca1 outeff_pca1 perc_cost_pca1 {
+  2.     egen z_`var' = std(`var')
+  3. }
+(1 missing value generated)
+(16 missing values generated)
+(4 missing values generated)
+(4 missing values generated)
+
+. 
+. rename z_threat_pca1            z_threat
+
+. rename z_selfeff_pca1       z_selfeff
+
+. rename z_outeff_pca1        z_outeff
+
+. rename z_perc_cost_pca1     z_costs
+
+. 
+. foreach var in z_threat z_selfeff z_outeff z_costs {
+  2.     quietly summarize `var' if !missing(`var')
+  3.     gen `var'_norm = (`var' - r(min)) / (r(max) - r(min))*100
+  4. }
+(1 missing value generated)
+(16 missing values generated)
+(4 missing values generated)
+(4 missing values generated)
+
+. 
+. * Binary and percentage versions of intergenerational and information items
+. 
+. gen intergen_empathy_dum = intergen_empathy == 5 if !missing(intergen_empathy)
+(2 missing values generated)
+
+. label values intergen_empathy_dum yesno
+
+. 
+. gen intergen_image_dum = intergen_image == 5 if !missing(intergen_image)
+
+. label values intergen_image_dum yesno
+
+. 
+. gen intergen_approval_dum = .
+(538 missing values generated)
+
+. replace intergen_approval_dum = 1 if intergen_approval == 3
+(329 real changes made)
+
+. replace intergen_approval_dum = 0 if intergen_approval > 3 & !missing(intergen_approval)
+(194 real changes made)
+
+. label values intergen_approval_dum both_future_lbl 
+
+. 
+. gen intergen_concern_dum = .
+(538 missing values generated)
+
+. replace intergen_concern_dum = 1 if intergen_concern == 3
+(294 real changes made)
+
+. replace intergen_concern_dum = 0 if intergen_concern > 3 & !missing(intergen_concern)
+(222 real changes made)
+
+. label values intergen_concern_dum both_future_lbl 
+
+. 
+. gen info_strat_dum = adapt_info_strat == 5 if !missing(adapt_info_strat)
+(6 missing values generated)
+
+. label values info_strat_dum yesno
+
+. 
+. gen info_impact_dum = adapt_info_impact == 5 if !missing(adapt_info_impact)
+(4 missing values generated)
+
+. label values info_impact_dum yesno
+
+. 
+. gen intergen_empathy_pct = intergen_empathy_dum * 100
+(2 missing values generated)
+
+. gen intergen_image_pct = intergen_image_dum * 100
+
+. gen intergen_approval_pct = intergen_approval_dum * 100 
+(15 missing values generated)
+
+. gen intergen_concern_pct = intergen_concern_dum * 100
+(22 missing values generated)
+
+. gen info_impact_pct = info_impact_dum * 100
+(4 missing values generated)
+
+. gen info_strat_pct = info_strat_dum * 100
+(6 missing values generated)
+
+. 
+. 
+. 
+. /*******************************************************************************
+> * 7. Organise dataset
+> *******************************************************************************/
+. 
+. * 1. IDs and sample structure
+. order site_ID player_ID ind_ID time_treat followup time4 returned_followup attrited balanced_followup meditation framing
+
+. 
+. * 2. Demographics and household
+. order gender_female age age_above34 maritalstatus married ///
+>       educ_level educ_highest educ_level_group educ_level_low educ_level_mid educ_level_high ///
+>       language hh_size num_children log_num_children num_adults years_residence_com, after(balanced_followup)
+
+. 
+. * 3. Economic background
+. order income_employed income_farming income_irfarming income_rainfedfarming ///
+>       income_animalhusb income_farmwage income_wagelabor income_business ///
+>       income_salary income_remittances income_none income_pca1 income_pca2 ///
+>       food_insec food_insec_freq food_insec_month ///
+>       assets_radio assets_television assets_smartphone assets_fan ///
+>       assets_solarpower assets_generator assets_car assets_pca1 assets_pca2 ///
+>       median_SES SES_above_median, after(years_residence_com)
+
+. 
+. * 4. Social and community position
+. order role_community role_community_dum role_gov leader ///
+>       trust_community trust_high, after(SES_above_median)
+
+. 
+. * 5. Adaptation and responsibility
+. order adapt_effort_myself adapt_effort_family adapt_effort_community ///
+>       adapt_effort_no adapt_effort_na adapt_effort_group ///
+>       respon_individual respon_family respon_community respon_organization ///
+>       respon_government respon_dk respon_group respon_external, after(trust_high)
+
+. 
+. * 6. Expectations and perceived problems
+. order ladder_today ladder_parents ladder_10years ladder_children ladder_futuregen ///
+>       severity1_none severity1_poverty severity1_unempl severity1_corruption ///
+>       severity1_climate severity1_economy severity1_crime severity1_health ///
+>       severity1_landuse severity1_youth severity1_childabuse severity1_electricity ///
+>       severity1_wildlife severity1_education ///
+>       severity2_none severity2_poverty severity2_unempl severity2_corruption ///
+>       severity2_climate severity2_economy severity2_crime severity2_health ///
+>       severity2_landuse severity2_youth severity2_childabuse severity2_electricity ///
+>       severity2_overpop severity3 severity4, after(respon_external)
+
+. 
+. * 7. Main attitudinal variables
+. order selfeff_impact selfeff_willigness selfeff_knowledge selfeff_ability ///
+>       selfeff_opportunities selfeff_skills ///
+>       outeff1 outeff2 cost_monetary cost_time ///
+>           intergen_empathy intergen_image intergen_approval intergen_concern ///
+>           adapt_info_strat adapt_info_impact, after(severity4)
+
+. 
+. * 8. Constructed indices and generated variables
+. order threat_pca1 selfeff_pca1 outeff_pca outeff_pca1 perc_cost_pca1 ///
+>       z_threat z_selfeff z_outeff z_costs ///
+>       z_threat_norm z_selfeff_norm z_outeff_norm z_costs_norm ///
+>       intergen_empathy_dum intergen_image_dum intergen_approval_dum intergen_concern_dum ///
+>       info_strat_dum info_impact_dum ///
+>       intergen_empathy_pct intergen_image_pct intergen_approval_pct intergen_concern_pct ///
+>       info_strat_pct info_impact_pct, after(adapt_info_impact)
+
+.           
+.           
+. /*******************************************************************************
+> * 8. Variable labels
+> *******************************************************************************/
+. 
+. label variable site_ID                 "Village / site identifier"
+
+. label variable player_ID               "Participant identifier within site"
+
+. label variable ind_ID                  "Unique individual identifier"
+
+. label variable time_treat              "Timing of treatment / interview relative to intervention"
+
+. label variable followup                "Interview wave"
+
+. label variable time4                   "Treatment timing including follow-up"
+
+. label variable returned_followup           "Returned in 8-month follow-up"
+
+. label variable attrited                            "Attrited by follow-up"
+
+. label variable balanced_followup       "Balanced follow-up sample indicator"
+
+. label variable meditation                          "Meditation treatment"
+
+. label variable framing                             "Framing treatment"  
+
+. 
+. label variable gender_female           "Female respondent"
+
+. label variable age                     "Age group"
+
+. label variable age_above34             "Respondent older than 34"
+
+. label variable maritalstatus           "Marital status"
+
+. label variable married                 "Respondent is married"
+
+. 
+. label variable educ_level              "Education level"
+
+. label variable educ_highest            "Highest grade completed"
+
+. label variable educ_level_group        "Education group"
+
+. label variable educ_level_low          "Low education group"
+
+. label variable educ_level_mid          "Medium education group"
+
+. label variable educ_level_high         "High education group"
+
+. label variable language                "Main language spoken"
+
+. 
+. label variable hh_size                 "Household size"
+
+. label variable num_children            "Number of children in household"
+
+. label variable log_num_children        "Log number of children in household"
+
+. label variable num_adults              "Number of adults in household"
+
+. label variable years_residence_com     "Years living in village / community"
+
+. 
+. label variable income_employed         "Receives income from employment"
+
+. label variable income_farming          "Receives income from farming"
+
+. label variable income_irfarming        "Irrigated farming as income source"
+
+. label variable income_rainfedfarming   "Rain-fed farming as income source"
+
+. label variable income_animalhusb       "Animal husbandry as income source"
+
+. label variable income_farmwagelabor    "Farm wage labor as income source"
+
+. label variable income_wagelabor        "Off-farm wage labor as income source"
+
+. label variable income_business         "Business as income source"
+
+. label variable income_salary           "Salaried employment as income source"
+
+. label variable income_remittances      "Remittances as income source"
+
+. label variable income_none             "No income source"
+
+. label variable income_pca1             "Income index, first principal component"
+
+. label variable income_pca2             "Income index, second principal component"
+
+. 
+. label variable food_insec              "Not enough money for food in last 12 months"
+
+. label variable food_insec_frequency    "Frequency of not having enough money for food"
+
+. label variable food_insec_month        "Food insecurity at least monthly"
+
+. 
+. label variable assets_radio            "Household owns radio"
+
+. label variable assets_television       "Household owns television"
+
+. label variable assets_smartphone       "Household owns smartphone"
+
+. label variable assets_fan              "Household owns fan"
+
+. label variable assets_solarpower       "Household owns solar power"
+
+. label variable assets_generator        "Household owns generator"
+
+. label variable assets_car              "Household owns car"
+
+. label variable assets_pca1             "Asset index, first principal component"
+
+. label variable assets_pca2             "Asset index, second principal component"
+
+. label variable median_SES              "Socio-economic status index"
+
+. label variable SES_above_median        "Socio-economic status above sample median"
+
+. 
+. label variable role_community          "Role in community"
+
+. label variable role_community_dum      "Has any community role"
+
+. label variable role_gov                "Has governance role"
+
+. label variable leader                  "Traditional authority / village head"
+
+. 
+. label variable trust_community         "Trust in community members"
+
+. label variable trust_high              "High trust in community"
+
+. 
+. label variable adapt_effort_myself     "Individual adaptation effort"
+
+. label variable adapt_effort_family     "Family adaptation effort"
+
+. label variable adapt_effort_community  "Community adaptation effort"
+
+. label variable adapt_effort_no         "No adaptation effort"
+
+. label variable adapt_effort_na         "Adaptation effort not applicable / unknown"
+
+. label variable adapt_effort_group      "Main grouping of adaptation effort"
+
+. 
+. label variable respon_individual       "Individual seen as responsible for addressing climate change"
+
+. label variable respon_family           "Family seen as responsible for addressing climate change"
+
+. label variable respon_community        "Community seen as responsible for addressing climate change"
+
+. label variable respon_organization     "Organization seen as responsible for addressing climate change"
+
+. label variable respon_government       "Government seen as responsible for addressing climate change"
+
+. label variable respon_dk               "Does not know who is responsible"
+
+. label variable respon_group            "Main grouping of responsibility for climate change"
+
+. label variable respon_external             "Government / external organizations responsible"
+
+. 
+. 
+. label variable ladder_today            "Current position on economic ladder"
+
+. label variable ladder_parents          "Parents' position on economic ladder"
+
+. label variable ladder_10years          "Expected own position in 10 years"
+
+. label variable ladder_children         "Expected children's position"
+
+. label variable ladder_futuregen        "Expected position of future generations"
+
+. 
+. label variable severity1_none          "No serious problem in community today"
+
+. label variable severity1_poverty       "Poverty and hunger are serious problems today"
+
+. label variable severity1_unempl        "Unemployment is a serious problem today"
+
+. label variable severity1_corruption    "Corruption is a serious problem today"
+
+. label variable severity1_climate       "Climate change is a serious problem today"
+
+. label variable severity1_economy       "Global economic downturn is a serious problem today"
+
+. label variable severity1_crime         "Crime and violence are serious problems today"
+
+. label variable severity1_health        "Health and diseases are serious problems today"
+
+. label variable severity1_landuse       "Improper land use is a serious problem today"
+
+. label variable severity1_youth         "Youth delinquency is a serious problem today"
+
+. label variable severity1_childabuse    "Child abuse is a serious problem today"
+
+. label variable severity1_electricity   "Lack of electricity is a serious problem today"
+
+. label variable severity1_wildlife      "Wildlife is a serious problem today"
+
+. label variable severity1_education     "Education is a serious problem today"
+
+. 
+. label variable severity2_none          "No serious problem in community in 20 years"
+
+. label variable severity2_poverty       "Poverty and hunger will be serious problems in 20 years"
+
+. label variable severity2_unempl        "Unemployment will be a serious problem in 20 years"
+
+. label variable severity2_corruption    "Corruption will be a serious problem in 20 years"
+
+. label variable severity2_climate       "Climate change will be a serious problem in 20 years"
+
+. label variable severity2_economy       "Global economic downturn will be a serious problem in 20 years"
+
+. label variable severity2_crime         "Crime and violence will be serious problems in 20 years"
+
+. label variable severity2_health        "Health and diseases will be serious problems in 20 years"
+
+. label variable severity2_landuse       "Improper land use will be a serious problem in 20 years"
+
+. label variable severity2_youth         "Youth delinquency will be a serious problem in 20 years"
+
+. label variable severity2_childabuse    "Child abuse will be a serious problem in 20 years"
+
+. label variable severity2_electricity   "Electricity shortage will be a serious problem in 20 years"
+
+. label variable severity2_overpop       "Overpopulation will be a serious problem in 20 years"
+
+. 
+. label variable severity3               "Perceived seriousness of climate change today"
+
+. label variable severity4               "Perceived seriousness of climate change in 20 years"
+
+. 
+. label variable selfeff_impact          "Today's decisions affect future generations"
+
+. label variable selfeff_willigness      "Willing to protect community against climate change"
+
+. label variable selfeff_knowledge       "Knows how to protect community against climate change"
+
+. label variable selfeff_ability         "Feels able to contribute through effort and hard work"
+
+. label variable selfeff_opportunities   "Perceives opportunities to protect community"
+
+. label variable selfeff_skills          "Has skills to protect community"
+
+. label variable outeff1                 "Believes individual actions make a difference"
+
+. label variable outeff2                 "Believes one person cannot make a difference"
+
+. label variable cost_monetary           "Economic situation limits environmental protection"
+
+. label variable cost_time               "Lack of time limits environmental protection"
+
+. 
+. label variable intergen_empathy        "Empathy toward future generations"
+
+. label variable intergen_image              "Ability to imagine future generations"
+
+. label variable intergen_approval       "Concern about how future generations judge current actions"
+
+. label variable intergen_concern        "Consideration of future consequences in daily behavior"
+
+. 
+. label variable adapt_info_strat        "Wants better information about adaptation options"
+
+. label variable adapt_info_impact       "Wants better information about climate change impacts"
+
+. 
+. label variable threat_pca1                 "Threat appraisal index"
+
+. label variable selfeff_pca1            "Self-efficacy index"
+
+. label variable outeff_pca              "Outcome-efficacy principal component score"
+
+. label variable outeff_pca1             "Signed outcome-efficacy index"
+
+. label variable perc_cost_pca1          "Perceived cost barriers index"
+
+. 
+. label variable z_threat                "Standardized threat appraisal index"
+
+. label variable z_selfeff               "Standardized self-efficacy index"
+
+. label variable z_outeff                "Standardized outcome-efficacy index"
+
+. label variable z_costs                 "Standardized perceived cost barriers index"
+
+. 
+. label variable z_threat_norm           "Normalized threat appraisal index"
+
+. label variable z_selfeff_norm          "Normalized self-efficacy index"
+
+. label variable z_outeff_norm           "Normalized outcome-efficacy index"
+
+. label variable z_costs_norm            "Normalized perceived cost barriers index"
+
+. 
+. label variable intergen_empathy_dum    "High empathy toward future generations"
+
+. label variable intergen_image_dum          "High ability to imagine future generations"
+
+. label variable intergen_approval_dum   "Future-oriented approval concern"
+
+. label variable intergen_concern_dum    "Future-oriented concern"
+
+. label variable info_strat_dum          "Requests more information on adaptation options"
+
+. label variable info_impact_dum         "Requests more information on climate impacts"
+
+. 
+. label variable intergen_empathy_pct    "Relative empathy toward future generations"
+
+. label variable intergen_image_pct          "Relative ability to imagine future generations"
+
+. label variable intergen_approval_pct   "Relative concern for future generations' approval"
+
+. label variable intergen_concern_pct    "Relative future-oriented concern"
+
+. label variable info_strat_pct          "Relative demand for adaptation information"
+
+. label variable info_impact_pct         "Relative demand for impact information"
+
+.           
+.           
+. // SAVE
+. 
+. save "$projectdir/processed/survey_explearning.dta", replace
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/processed/survey_explearning.dta saved
+
+. 
+. clear all
+
+. 
+end of do-file
+
+. do "$projectdir/scripts/02_analysis.do"
+
+. /*******************************************************************************
+> * Project:  Experiential Learning Namibia
+> * File:     02_analysis.do
+> * Purpose:  Replicates manuscript figures and appendix tables/figures
+> * Data:     processed/survey_explearning.dta
+> *
+> * Notes:        This script is organized by paper output.
+> *******************************************************************************/
+. 
+. 
+. clear all
+
+. set more off
+
+. 
+. 
+. /*****************************************************************************
+> * 1. Load analysis data
+> *****************************************************************************/
+. 
+. use "$projectdir/processed/survey_explearning.dta", clear
+
+. xtset ind_ID followup
+
+Panel variable: ind_ID (unbalanced)
+ Time variable: followup, 0 to 1
+         Delta: 1 unit
+
+. 
+. /*******************************************************************************
+> * 2. Common globals
+> *******************************************************************************/
+. 
+. global controls gender_female age_above34 married educ_level role_gov
+
+. global outcomes z_threat z_selfeff z_outeff z_costs intergen_empathy_dum intergen_image_dum intergen_approval_dum intergen_concern_dum info_impact_dum info_
+> strat_dum
+
+. 
+. 
+. /*******************************************************************************
+> * 3. Main manuscript figures
+> *******************************************************************************/
+. 
+. *------------------------------------------------------------------------------*
+. * Figure 3: * Distribution of outcome measures across all surveyed participants
+. *------------------------------------------------------------------------------*
+. stripplot z_threat_norm z_selfeff_norm z_outeff_norm z_costs_norm if followup==0, ///
+>     msymbol(oh) mcolor(black%30) ///
+>     yla(0(20)100, labsize(medsmall) nogrid) msize(medium) ///
+>     xtitle("") ytitle("Score", size(medium)) ///
+>     vertical center cumul cumprob bar boffset(0) ///
+>     refline(lw(medium) lc(red) lp(dash)) reflinestretch(0.01) ///
+>     xlabel(1 "Threat Appraisal" ///
+>            2 "Self-efficacy" ///
+>            3 "Outcome efficacy" ///
+>            4 "Perceived costs", ///
+>            labsize(small) noticks) ///
+>     yla(, ang(h)) jitter(0.5) ///
+>     title("{bf: A} Threat Appraisal and Perceived Behavior Control", placement(left) margin(0 0 5 0)) ///
+>     xsize(5) ysize(2.5)
+
+. gr save "$projectdir/results/intermediate/Figure3_panelA.gph", replace
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure3_panelA.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure3_panelA.gph saved
+
+. 
+. graph hbar intergen_empathy_pct intergen_image_pct intergen_approval_pct intergen_concern_pct info_impact_pct info_strat_pct if followup==0, bargap(50) ylab
+> el(0 "0%" 20 "20%" 40 "40%" 60 "60%" 80 "80%" 100 "100%", angle(horizontal) labsize(medsmall)) blabel(bar, format(%2.0f) size(medsmall) color(black)) ///
+>     legend(position(6) cols(1) ///
+>         label(1 "Empathy of future generations") ///
+>         label(2 "Imagination of future generations") ///
+>         label(3 "Importance of social approval from future & current generations") ///
+>         label(4 "Consideration of future & current concerns") ///
+>         label(5 "Information demand: Impacts") ///
+>         label(6 "Information demand: Adaptation strategies")) ///
+>     title("{bf:B} Intergenerational Dimensions and Information Demand", ///
+>         placement(left) margin(0 0 5 0)) ///
+>     bar(1, color(gs0)) bar(2, color(gs3)) bar(3, color(gs6)) bar(4, color(gs9)) bar(5, color(gs12)) bar(6, color(gs13)) ///
+>     xsize(5) ysize(2.5)
+
+. gr save "$projectdir/results/intermediate/Figure3_panelB.gph", replace
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure3_panelB.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure3_panelB.gph saved
+
+. 
+. graph combine "$projectdir/results/intermediate/Figure3_panelA.gph" ///
+>               "$projectdir/results/intermediate/Figure3_panelB.gph", ///
+>               cols(2) xsize(12) ysize(5) imargin(1 1 1 1) ///
+>               saving("$projectdir/results/intermediate/Figure3.gph", replace)
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure3.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure3.gph saved
+
+.     graph export "$projectdir/results/figures/Figure3_distribution_outcomes.png", replace width(4000)
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/figures/Figure3_distribution_outcomes.png not
+    found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/figures/Figure3_distribution_outcomes.png saved as
+    PNG format
+
+. 
+. *------------------------------------------------------------------------------*
+. * Figure 4
+. * Main workshop-day effects of the intervention on experiential-learning outcomes
+. *------------------------------------------------------------------------------*
+. eststo clear
+
+. foreach y of varlist $outcomes {
+  2.     qui reg `y' i.time_treat $controls i.site_ID if followup == 0, vce(cluster site_ID)
+  3.     eststo `y'
+  4. }
+
+. 
+. coefplot ///
+> (z_threat, label("Threat appraisal") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (z_selfeff, label("Self-efficacy") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (z_outeff, label("Outcome-efficacy") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (z_costs, label("Perceived costs") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_empathy_dum, label("Empathy toward future generation") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 0.8))) ///
+> (intergen_image_dum, label("Imagination of future generations") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_approval_dum, label("Care about today's & future's social approval") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_concern_dum, label("Consideration of immediate & future concerns") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (info_impact_dum, label("Information demand about impacts of cc") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (info_strat_dum, label("Information demand about adaptation strategies") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> , keep(1.time_treat) ///
+>   ylabel(0.6 "Threat appraisal" 0.69 "Self-efficacy" 0.78 "Outcome-efficacy" 0.87 "Perceived costs" 0.96 `" "Empathy toward" "future generation" "' 1.05 `" 
+> "Imagination of" "future generations" "' 1.14 `" "Care about generations" "of today and in future" "' 1.23 `" "Consideration of immediate" "& future concern
+> s" "' 1.32 `" "Information demand" "about impacts of cc" "' 1.41 `" "Information demand about" "adaptation strategies" "', valuelabel labsize(small)) ///
+>   xlabel(-0.6(0.2)0.8, labsize(small)) ///
+>   title("{bf: A} T1 - After game", size() margin(b+2)) ///
+>   coeflabels(1.time_treat = " ") ///
+>   xline(0) legend(off) scale(1) xsize(3) ysize(2) ///
+> saving("$projectdir/results/intermediate/Figure4_T1.gph", replace)
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure4_T1.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure4_T1.gph saved
+
+. 
+. coefplot ///
+> (z_threat, label("Threat appraisal") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (z_selfeff, label("Self-efficacy") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (z_outeff, label("Outcome-efficacy") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (z_costs, label("Perceived costs") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_empathy_dum, label("Empathy toward future generation") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_image_dum, label("Imagination of future generations") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_approval_dum, label("Care about today's & future's social approval") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_concern_dum, label("Consideration of immediate & future concerns") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (info_impact_dum, label("Information demand about impacts of cc") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (info_strat_dum, label("Information demand about adaptation strategies") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> , keep(2.time_treat) ///
+>   ylabel(0.6 "Threat appraisal" 0.69 "Self-efficacy" 0.78 "Outcome-efficacy" 0.87 "Perceived costs" 0.96 `" "Empathy toward" "future generation" "' 1.05 `" 
+> "Imagination of" "future generations" "' 1.14 `" "Care about generations" "of today and in future" "' 1.23 `" "Consideration of immediate" "& future concern
+> s" "' 1.32 `" "Information demand" "about impacts of cc" "' 1.41 `" "Information demand about" "adaptation strategies" "', valuelabel labsize(small)) ///
+>   xlabel(-0.6(0.2)0.8, labsize(small)) ///
+>   title("{bf: B} T2 - After game & workshop", margin(b+2)) ///
+>   coeflabels(2.time_treat = " ") ///
+>   xline(0) legend(off) scale(1) xsize(3) ysize(2) ///
+> saving("$projectdir/results/intermediate/Figure4_T2.gph", replace)
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure4_T2.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure4_T2.gph saved
+
+. 
+. graph combine "$projectdir/results/intermediate/Figure4_T1.gph" ///
+>               "$projectdir/results/intermediate/Figure4_T2.gph", ///
+>               cols(2) xsize(12) ysize(6) imargin(1 1 1 1) ///
+>               saving("$projectdir/results/intermediate/Figure4.gph", replace)
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure4.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure4.gph saved
+
+. graph export "$projectdir/results/figures/Figure4_main_effects.png", replace width(4000)
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/figures/Figure4_main_effects.png not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/figures/Figure4_main_effects.png saved as PNG
+    format
+
+. 
+. *------------------------------------------------------------------------------*
+. * Figure 5
+. * 8-month persistence (within-subject, T2 only)
+. *------------------------------------------------------------------------------*
+. eststo clear
+
+. foreach y of varlist $outcomes {
+  2.     qui reg `y' i.balanced_followup $controls i.site_ID if time_treat == 2, vce(cluster ind_ID)
+  3.     eststo `y'_p
+  4. }
+
+. 
+. coefplot ///
+> (z_threat_p, label("Threat appraisal") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (z_selfeff_p, label("Self-efficacy") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (z_outeff_p, label("Outcome-efficacy") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (z_costs_p, label("Perceived costs") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_empathy_dum_p, label("Empathy toward future generation") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_image_dum_p, label("Imagination of future generations") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (intergen_approval_dum_p, label("Care about today's & future's social approval") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) /
+> //
+> (intergen_concern_dum_p, label("Consideration of immediate & future concerns") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (info_impact_dum_p, label("Information demand about impacts of cc") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> (info_strat_dum_p, label("Information demand about adaptation strategies") msize(medium) mcolor(gs8) levels(95 90) ciopts(color(gs8 gs8) lw(0.4 1))) ///
+> , keep(1.balanced_followup) ///
+>   ylabel(0.6 "Threat appraisal" 0.69 "Self-efficacy" 0.78 "Outcome-efficacy" 0.87 "Perceived costs" 0.96 `" "Empathy toward" "future generation" "' 1.05 `" 
+> "Imagination of" "future generations" "' 1.14 `" "Care about generations" "of today and in future" "' 1.23 `" "Consideration of immediate" "& future concern
+> s" "' 1.32 `" "Information demand" "about impacts of cc" "' 1.41 `" "Information demand about" "adaptation strategies" "', valuelabel labsize(small)) ///
+>   xlabel(-0.6(0.2)1.2, labsize(small)) ///
+>   coeflabels(1.balanced_followup = " ") ///
+>   xline(0) legend(off) scale(1.05) xsize(3) ysize(2) ///
+>   saving("$projectdir/results/intermediate/Figure5.gph", replace) ///
+>   caption("Regression estimate relative to intervention day")
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure5.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/Figure5.gph saved
+
+. graph export "$projectdir/results/figures/Figure5_persistence.png", replace width(4000)
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/figures/Figure5_persistence.png not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/figures/Figure5_persistence.png saved as PNG format
+
+. 
+. /*******************************************************************************
+> * 4. Appendix figures
+> *******************************************************************************/
+. 
+. *------------------------------------------------------------------------------*
+. * Figure A2
+. * Distributions of index outcome variables over time
+. *------------------------------------------------------------------------------*
+. foreach y in z_threat_norm z_selfeff_norm z_outeff_norm z_costs_norm {
+  2.     if "`y'" == "z_threat_norm" {
+  3.         local ttl "Threat appraisal index over time"
+  4.     }
+  5.     else if "`y'" == "z_selfeff_norm" {
+  6.         local ttl "Self-efficacy index over time"
+  7.     }
+  8.     else if "`y'" == "z_outeff_norm" {
+  9.         local ttl "Outcome-efficacy index over time"
+ 10.     }
+ 11.     else if "`y'" == "z_costs_norm" {
+ 12.         local ttl "Perceived costs index over time"
+ 13.     }
+ 14. 
+.     stripplot `y', over(time4) variablelabels ///
+>         msymbol(oh) mcolor(black%30) ///
+>         yla(0(20)100, labsize(small) nogrid) ///
+>         msize(medium) ///
+>         xtitle("") ytitle("Score", size(small)) ///
+>         vertical center cumul cumprob bar boffset(0) ///
+>         refline(lw(medium) lc(red) lp(dash)) ///
+>         reflinestretch(0.01) ///
+>         xla(, labsize(small) noticks) ///
+>         yla(, ang(h)) ///
+>         jitter(0.5) ///
+>         title("`ttl'", size(medium) placement(left) margin(0 0 5 0)) ///
+>         saving("$projectdir/results/intermediate/`y'_A2.gph", replace)
+ 15. }
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/z_threat_norm_A2.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/z_threat_norm_A2.gph saved
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/z_selfeff_norm_A2.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/z_selfeff_norm_A2.gph saved
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/z_outeff_norm_A2.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/z_outeff_norm_A2.gph saved
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/z_costs_norm_A2.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/z_costs_norm_A2.gph saved
+
+. 
+. graph combine "$projectdir/results/intermediate/z_threat_norm_A2.gph" ///
+>               "$projectdir/results/intermediate/z_selfeff_norm_A2.gph" ///
+>               "$projectdir/results/intermediate/z_outeff_norm_A2.gph" ///
+>               "$projectdir/results/intermediate/z_costs_norm_A2.gph", ///
+>               cols(2)iscale(0.6) xsize(15) ysize(10) ///
+>               saving("$projectdir/results/intermediate/FigureA2.gph", replace)
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/FigureA2.gph not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/intermediate/FigureA2.gph saved
+
+. graph export "$projectdir/results/figures/FigureA2_distribution_index_outcomes.png", replace width(4000)
+(file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/figures/FigureA2_distribution_index_outcomes.png
+    not found)
+file C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia/results/figures/FigureA2_distribution_index_outcomes.png
+    saved as PNG format
+
+. 
+. *------------------------------------------------------------------------------*
+. * Figure A3
+. * Distributions of binary outcome variables over time
+. *------------------------------------------------------------------------------*
+. mylabels 0(20)100, myscale(@) suffix("%") local(pctlabel)
+0 "0%" 20 "20%" 40 "40%" 60 "60%" 80 "80%" 100 "100%"
+
+. foreach y in intergen_empathy_dum intergen_image_dum intergen_approval_dum intergen_concern_dum info_impact_dum info_strat_dum {
+  2.     local ttl : variable label `y'
+  3.     catplot, over(`y') over(time4, label()) asyvars stack percent(time4) ///
+>         ylabel(`pctlabel', nogrid) ///
+>         blabel(bar, size(small) format(%9.0f) pos(center) color(black)) ///
+>         title("`ttl'", size(medsmall)) legend(rows(1) position(6)) ///
+>         bar(1, fcolor(gs6) lcolor(black) lwidth(thin)) ///
+>         bar(2, fcolor(gs10) lcolor(black) lwidth(thin)) ///
+>         saving("$projectdir/results/intermediate/`y'_A3.gph", replace)
+  4. }
+command catplot is unrecognized
+r(199);
+
+end of do-file
+r(199);
+
+end of do-file
+
+r(199);
+
+. do "C:\Users\istei\AppData\Local\Temp\STD12ac_000000.tmp"
+
+. /*******************************************************************************
+> * Project: Experiential Learning: Evidence from rural Namibia
+> * File:    run.do
+> * Purpose: Runs 01_clean.do and 02_analysis.do for replication
+> *******************************************************************************/
+.         
+. *   All raw datafiles are stored in /data
+. *   All figures reported in the main manuscript are outputted to /results/figures
+. *   All tables are reported in the main manuscript are outputted to /results/tables
+. 
+. *       TO PERFORM A CLEAN RUN, DELETE THE FOLLOWING TWO FOLDERS:
+. *   /processed
+. *   /results
+. 
+. 
+. /*******************************************************************************
+> * Set global Working Directory
+> *******************************************************************************/
+. * Define this global macro to point where the replication folder is saved locally that includes this run.do script
+. 
+. global projectdir : pwd
+
+. 
+. di "Working directory: $projectdir"
+Working directory: C:\Users\istei\Nextcloud_Ivo\Everything_All_at_Once\Replication_ExperientialLearningNamibia
+
+. 
+. 
+. /*******************************************************************************
+> * Program Setup
+> *******************************************************************************/
+. 
+. * Initialize log and record system parameters
+. clear
+
+. set more off
+
+. cap mkdir "$projectdir/scripts/logs"
+
+. cap log close
