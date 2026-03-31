@@ -12,6 +12,8 @@
 
 **Keywords**: Climate Adaptation; Experiential Learning; Behavioral Control; Future Visioning; Namibia
 
+[![DOI](https://zenodo.org/badge/1197480372.svg)](https://doi.org/10.5281/zenodo.19355757)
+
 
 
 ---
